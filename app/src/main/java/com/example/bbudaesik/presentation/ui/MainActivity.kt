@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import com.example.bbudaesik.presentation.navigation.BDSNavHost
 import com.example.bbudaesik.presentation.ui.componenets.BDSTopAppBar
 import com.example.bbudaesik.presentation.ui.theme.BbudaesikTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

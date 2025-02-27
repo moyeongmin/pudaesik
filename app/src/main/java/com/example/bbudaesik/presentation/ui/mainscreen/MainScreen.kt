@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.bbudaesik.presentation.ui.componenets.CateteriaMenu
@@ -36,10 +38,13 @@ fun MainScreen(
         selectedDate = uiState.selectedDate,
         weekInfo = weekInfo,
         resturantName = uiState.resturantNames,
+        menuList = uiState.menuData,
+        isLoading = uiState.isLoading,
+        error = uiState.error,
         isFavorite = uiState.isFavorite,
         onCafeteriaClicked = viewModel::onCafeteriaClicked,
         onDateClicked = viewModel::onDateClicked,
-        onFavoriteClicked = viewModel::onFavoriteClicked
+        onFavoriteClicked = viewModel::onFavoriteClicked,
     )
 }
 
@@ -50,6 +55,9 @@ fun MainScreen(
     weekInfo: WeekInfo,
     resturantName: List<String>,
     isFavorite: List<Boolean>,
+    menuList: List<String>, // ✅ API에서 가져온 메뉴 리스트 추가
+    isLoading: Boolean,
+    error: String,
     onCafeteriaClicked: (Int) -> Unit,
     onDateClicked: (Int) -> Unit,
     onFavoriteClicked: (Int) -> Unit,
@@ -77,16 +85,18 @@ fun MainScreen(
             thickness = 1.dp,
             color = Color(0xFFC2C2C4)
         )
-        CateteriaMenu(
-            resturantName = resturantName,
-            isFavorite = isFavorite,
-            onFavoriteClicked = onFavoriteClicked,
-            menuList = listOf(
-                listOf("김치찌개", "된장찌개", "떡볶이"),
-                listOf("김치찌개", "된장찌개", "떡볶이"),
-                listOf("김치찌개", "된장찌개", "떡볶이"),
-            ),
-        )
+        if (isLoading) {
+            Text(text = "로딩 중...", modifier = Modifier.padding(16.dp))
+        } else if (error.isNotEmpty()) {
+            Text(text = "오류: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
+        } else {
+            CateteriaMenu(
+                resturantName = resturantName,
+                isFavorite = isFavorite,
+                onFavoriteClicked = onFavoriteClicked,
+                menuList = listOf(menuList)
+            )
+        }
     }
 }
 
@@ -107,7 +117,10 @@ private fun MainScreenPreview() {
                 isFavorite = listOf(true, false),
                 onCafeteriaClicked = {},
                 onDateClicked = {},
-                onFavoriteClicked = {}
+                onFavoriteClicked = {},
+                menuList = listOf("김치찌개", "된장찌개", "떡볶이"),
+                isLoading = false,
+                error = "",
             )
         }
     }

@@ -25,9 +25,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BaseURL", properties.getProperty("base_url"))
-        buildConfigField("String","API_KEY", properties.getProperty("api_key"))
-        buildConfigField("String","Restaurant_Db_Id", properties.getProperty("restaurant_db_id"))
-        buildConfigField("String","Dormitory_Db_Id", properties.getProperty("dormitory_db_id"))
+        buildConfigField("String", "API_KEY", properties.getProperty("api_key"))
+        buildConfigField("String", "Restaurant_Db_Id", properties.getProperty("restaurant_db_id"))
+        buildConfigField("String", "Dormitory_Db_Id", properties.getProperty("dormitory_db_id"))
     }
 
     buildTypes {
@@ -80,18 +80,14 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
 
-    /**
-     *  // ✅ Hilt Core
-     *     implementation "com.google.dagger:hilt-android:2.48"
-     *     kapt "com.google.dagger:hilt-compiler:2.48"
-     *
-     *     // ✅ Hilt와 Jetpack Compose 연결
-     *     implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
-     *
-     *     // ✅ Jetpack Compose 관련 라이브러리
-     *     implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
-     * 추가하기
-     */
+    //implementation("com.google.dagger:hilt-android:2.48")
+
+    // ✅ Hilt와 Jetpack Compose 연결
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // ✅ Jetpack Compose 관련 라이브러리
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 }
