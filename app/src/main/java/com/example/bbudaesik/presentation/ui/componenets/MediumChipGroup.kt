@@ -1,5 +1,6 @@
 package com.example.bbudaesik.presentation.ui.componenets
 
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +60,8 @@ fun MediumChipGroup(
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null
-                    ) { onChipClicked(subtitles[index]) }
+                    ) { Log.d("test", "index: ${subtitles[index]}");
+                        onChipClicked(subtitles[index]) }
                     .onGloballyPositioned { layoutCoordinates: LayoutCoordinates ->
                         val x = layoutCoordinates.positionInParent().x
                         val width = layoutCoordinates.size.width

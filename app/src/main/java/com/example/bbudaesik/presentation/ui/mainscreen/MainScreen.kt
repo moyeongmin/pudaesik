@@ -1,6 +1,5 @@
 package com.example.bbudaesik.presentation.ui.mainscreen
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -55,7 +54,7 @@ fun MainScreen(
     weekInfo: WeekInfo,
     resturantName: List<String>,
     isFavorite: List<Boolean>,
-    menuList: List<String>, // ✅ API에서 가져온 메뉴 리스트 추가
+    menuList: Map<String, Map<String, String>>,
     isLoading: Boolean,
     error: String,
     onCafeteriaClicked: (Int) -> Unit,
@@ -94,13 +93,13 @@ fun MainScreen(
                 resturantName = resturantName,
                 isFavorite = isFavorite,
                 onFavoriteClicked = onFavoriteClicked,
-                menuList = listOf(menuList)
+                menuList = menuList
             )
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Suppress("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview(device = "id:small_phone")
 @Composable
 private fun MainScreenPreview() {
@@ -118,7 +117,7 @@ private fun MainScreenPreview() {
                 onCafeteriaClicked = {},
                 onDateClicked = {},
                 onFavoriteClicked = {},
-                menuList = listOf("김치찌개", "된장찌개", "떡볶이"),
+                menuList = mapOf(),
                 isLoading = false,
                 error = "",
             )

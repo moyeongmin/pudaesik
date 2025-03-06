@@ -1,6 +1,7 @@
 package com.example.bbudaesik.utils
 
 object BuildingInfo {
+
     /** 식당 코드 */
     val restaurantCodes = mapOf(
         "금정회관교직원식당" to "PG001",
@@ -12,8 +13,14 @@ object BuildingInfo {
         "편의동2층양산식당" to "Y001"
     )
 
+    val regionRestaurants = mapOf(
+        "부산" to listOf("금정회관학생식당", "금정회관교직원식당", "샛벌회관식당"),
+        "밀양" to listOf("학생회관밀양학생식당", "학생회관밀양교직원식당"),
+        "양산" to listOf("편의동2층양산식당")
+    )
+
     /** 기숙사 코드 */
-    val dormitoryCodes = mapOf(
+    val regionDormitories = mapOf(
         "진리관" to "2",
         "웅비관" to "11",
         "자유관" to "13",

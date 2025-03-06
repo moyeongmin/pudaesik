@@ -80,16 +80,16 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
 
-    //implementation("com.google.dagger:hilt-android:2.48")
 
-    // ✅ Hilt와 Jetpack Compose 연결
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // ✅ Jetpack Compose 관련 라이브러리
     implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.gson)
+    implementation(libs.converter.gson)
+
 }
 
 kapt {

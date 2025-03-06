@@ -9,25 +9,20 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     @Provides
     @Singleton
     fun provideNotionApi(): NotionApiService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BaseURL)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(NotionApiService::class.java)
     }
@@ -42,6 +37,6 @@ object AppModule {
                 "RESTAURANT" to BuildConfig.Restaurant_Db_Id,
                 "DORMITORY" to BuildConfig.Dormitory_Db_Id,
             ),
-            )
+        )
     }
 }
