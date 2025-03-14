@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.example.bbudaesik.presentation.ui.componenets.CateteriaMenu
+import com.example.bbudaesik.presentation.ui.componenets.CafeteriaMenu
 import com.example.bbudaesik.presentation.ui.componenets.LargeChipGroup
 import com.example.bbudaesik.presentation.ui.componenets.MediumChipGroup
 import com.example.bbudaesik.presentation.ui.theme.BbudaesikTheme
@@ -37,7 +37,8 @@ fun MainScreen(
         selectedDate = uiState.selectedDate,
         weekInfo = weekInfo,
         resturantName = uiState.resturantNames,
-        menuList = uiState.menuData,
+        dorMenuList = uiState.dorMenuData,
+        resMenuList = uiState.resMenuData,
         isLoading = uiState.isLoading,
         error = uiState.error,
         isFavorite = uiState.isFavorite,
@@ -54,7 +55,8 @@ fun MainScreen(
     weekInfo: WeekInfo,
     resturantName: List<String>,
     isFavorite: List<Boolean>,
-    menuList: Map<String, Map<String, String>>,
+    dorMenuList: Map<String, Map<String, String>>,
+    resMenuList: Map<String, Map<String, Map<String, String>>>,
     isLoading: Boolean,
     error: String,
     onCafeteriaClicked: (Int) -> Unit,
@@ -89,11 +91,12 @@ fun MainScreen(
         } else if (error.isNotEmpty()) {
             Text(text = "오류: $error", color = Color.Red, modifier = Modifier.padding(16.dp))
         } else {
-            CateteriaMenu(
+            CafeteriaMenu(
                 resturantName = resturantName,
                 isFavorite = isFavorite,
                 onFavoriteClicked = onFavoriteClicked,
-                menuList = menuList
+                dorMenuList = dorMenuList,
+                resMenuList = resMenuList,
             )
         }
     }
@@ -117,7 +120,8 @@ private fun MainScreenPreview() {
                 onCafeteriaClicked = {},
                 onDateClicked = {},
                 onFavoriteClicked = {},
-                menuList = mapOf(),
+                dorMenuList = mapOf(),
+                resMenuList = mapOf(),
                 isLoading = false,
                 error = "",
             )

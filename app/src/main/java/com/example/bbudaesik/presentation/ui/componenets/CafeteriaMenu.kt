@@ -16,57 +16,78 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CateteriaMenu(
+fun CafeteriaMenu(
     resturantName: List<String>,
     isFavorite: List<Boolean>,
-    menuList: Map<String, Map<String, String>>,
+    dorMenuList: Map<String, Map<String, String>>,
     onFavoriteClicked: (Int) -> Unit,
+    resMenuList: Map<String, Map<String, Map<String, String>>>,
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp),
     ) {
-        Log.d("CateteriaMenu", "메뉴 데이터 : $menuList")
-
-        items(menuList.size) { index ->
-            val restaurantName = menuList.keys.elementAt(index) // ✅ 식당 이름 가져오기
-            val mealTypes = menuList[restaurantName] ?: emptyMap() // ✅ 식사 종류별 메뉴 가져오기
-            Log.d("CateteriaMenu", "식당 이름 : $restaurantName, 메뉴 : $mealTypes")
+        //기숙사 식단
+        items(resMenuList.size) { index ->
+            val resName = resMenuList.keys.elementAt(index)
+            val mealMap = resMenuList[resName] ?: emptyMap()
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
             ) {
-                // ✅ 식당 이름 출력
                 Text(
-                    text = restaurantName,
+                    text = resName,
                     style = MaterialTheme.typography.headlineSmall,
                 )
-//                IconButton(
-//                    modifier = Modifier
-//                        .align(Alignment.CenterEnd)
-//                        .size(30.dp),
-//                    onClick = { onFavoriteClicked(index) }
-//                ) {
-//                    if (isFavorite[index]) { 즐겨찾기 기능 추가하기
-//                        Icon(
-//                            imageVector = ImageVector.vectorResource(R.drawable.star_filled),
-//                            contentDescription = "favorite",
-//                            tint = Color.Unspecified,
-//                        )
-//                    } else {
-//                        Icon(
-//                            imageVector = ImageVector.vectorResource(R.drawable.star_filled), // ✅ 변경: 기본 아이콘 추가
-//                            contentDescription = "favorite",
-//                            tint = lightColorScheme().onSurfaceVariant,
-//                        )
-//                    }
-//                }
-                // ✅ 조식, 중식, 석식 메뉴 출력
+
                 listOf("조식", "중식", "석식").forEach { mealType ->
-                    mealTypes[mealType]?.let { menuContent ->
+                    val menuContent = mealMap[mealType]?.get("menu")
+                    val mealCost = mealMap[mealType]?.get("mealCost")
+                    Log.d("resmenu", "mealType: $mealType, menuContent: $menuContent, mealCost: $mealCost")
+                    if (!menuContent.isNullOrEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
+                            text = mealType,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = lightColorScheme().onSurfaceVariant
+                        )
+
+                        TextBox(
+                            title = mealCost?:"",
+                            content = menuContent.split("\n")
+                        )
+
+                        Spacer(modifier = Modifier.padding(10.dp))
+                    }
+                }
+            }
+        }
+
+        // 식당 식단 출력
+        Log.d("resare", resMenuList.toString())
+
+        items(resMenuList.size) { index ->
+            val resName = resMenuList.keys.elementAt(index)
+            val mealMap = resMenuList[resName] ?: emptyMap()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+            ) {
+                Text(
+                    text = resName,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+
+                listOf("조식", "중식", "석식").forEach { mealType ->
+                    val menu = mealMap[mealType]?.get("menu")
+                    val mealCost = mealMap[mealType]?.get("mealCost")
+
+                    if (!menu.isNullOrEmpty()) {
                         Text(
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
                             text = mealType,
@@ -74,8 +95,8 @@ fun CateteriaMenu(
                             color = lightColorScheme().onSurfaceVariant
                         )
                         TextBox(
-                            title = "정식 - 4000원", // ✅ 가격 데이터 없으므로 기본값 유지
-                            content = menuContent.split("\n"), // ✅ 줄바꿈 기준으로 메뉴 나누기
+                            title = "정식 - ${mealCost ?: "가격 없음"}",
+                            content = menu.split("\n")
                         )
                         Spacer(modifier = Modifier.padding(10.dp))
                     }
@@ -88,11 +109,31 @@ fun CateteriaMenu(
 @Preview
 @Composable
 private fun CafeteriaMenuPreview() {
-    CateteriaMenu(
-        resturantName = listOf("학생식당", "교직원식당"),
+    val resMenuList = mapOf(
+        "금정회관" to mapOf(
+            "중식" to mapOf(
+                "menu" to "돈까스덮밥\n미소된장국\n배추김치",
+                "mealCost" to "4500원"
+            ),
+            "석식" to mapOf(
+                "menu" to "짜장밥\n계란국\n단무지\n배추김치",
+                "mealCost" to "4300원"
+            )
+        )
+    )
+
+    val dorMenuList = mapOf(
+        "자유관" to mapOf(
+            "조식" to "잡곡밥\n미역국\n닭볶음탕\n배추김치",
+            "석식" to "흑미밥\n된장찌개\n제육볶음\n김치"
+        )
+    )
+
+    CafeteriaMenu(
+        resturantName = listOf("금정회관", "자유관"),
         isFavorite = listOf(true, false),
-        menuList = mapOf(
-        ),
+        dorMenuList = dorMenuList,
         onFavoriteClicked = {},
+        resMenuList = resMenuList
     )
 }

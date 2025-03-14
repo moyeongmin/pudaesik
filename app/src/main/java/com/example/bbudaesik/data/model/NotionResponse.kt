@@ -8,43 +8,42 @@ data class RestaurantResponse(
 )
 
 data class RestaurantPage(
-    @SerializedName("id") val id: String,
-    @SerializedName("properties") val properties: RestaurantProperties
+    val properties: RestaurantProperties
 )
 
 data class RestaurantProperties(
-    @SerializedName("MENU_DATE") val menuDate: RichTextProperty? = null,
-    @SerializedName("MENU_TYPE") val menuType: RichTextProperty? = null,
-    @SerializedName("BUILDING_NAME") val buildingName: RichTextProperty? = null,
-    @SerializedName("MENU_CONTENT") val menuContent: RichTextProperty? = null
+    @SerializedName("MENU_TYPE") val menuType: RichText, // 식사 종류
+    @SerializedName("RESTAURANT_CODE") val restaurantCode: RichText, // 식당 코드
+    @SerializedName("MENU_CONTENT") val menuContent: RichText, // 식단 텍스트
+    @SerializedName("MENU_TITLE") val menuTitle: RichText, // 식사 종류
 )
 
-/** ✅ 기숙사 데이터 응답 DTO */
 data class DormitoryResponse(
-    @SerializedName("results") val results: List<DormitoryPage>
+    val results: List<DormitoryMeal>
 )
 
-data class DormitoryPage(
-    @SerializedName("id") val id: String,
-    @SerializedName("properties") val properties: DormitoryProperties
+data class DormitoryMeal(
+    val properties: DormitoryProperties
 )
 
 data class DormitoryProperties(
-    @SerializedName("mealDate") val mealDate: RichTextProperty? = null,
-    @SerializedName("codeNm") val codeNm: RichTextProperty? = null,
-    @SerializedName("mealNm") val mealNm: RichTextProperty? = null,
-    @SerializedName("no") val dormitoryId: RichTextProperty? = null
+    val no: noTitle,          // 기숙사 번호
+    val codeNm: RichText,       // 식사 종류
+    val mealNm: RichText,       // 식단 텍스트
+    val mealDate: RichText      // 식사 날짜
 )
 
-/** ✅ 공통 RichText */
-data class RichTextProperty(
-    @SerializedName("rich_text") val richText: List<RichTextContent>? = null
+data class RichText(
+    val rich_text: List<RichTextContent>?
 )
 
 data class RichTextContent(
-    @SerializedName("text") val text: TextContent? = null
+    val plain_text: String?
 )
 
-data class TextContent(
-    @SerializedName("content") val content: String? = ""
+data class noTitle(
+    val title: List<RichTextContent>?
 )
+
+
+

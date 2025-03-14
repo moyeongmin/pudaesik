@@ -13,6 +13,16 @@ object BuildingInfo {
         "편의동2층양산식당" to "Y001"
     )
 
+    val resCodeToNm = mapOf(
+        "PG001" to "금정회관 교직원식당",
+        "PG002" to "금정회관 학생식당",
+        "PS001" to "샛벌회관식당",
+        "PH002" to "학생회관 학생식당",
+        "M001" to "학생회관(밀양) 학생식당",
+        "M002" to "학생회관(밀양) 교직원식당",
+        "Y001" to "편의동2층(양산)식당"
+    )
+
     val regionRestaurants = mapOf(
         "부산" to listOf("금정회관학생식당", "금정회관교직원식당", "샛벌회관식당"),
         "밀양" to listOf("학생회관밀양학생식당", "학생회관밀양교직원식당"),
@@ -26,6 +36,14 @@ object BuildingInfo {
         "자유관" to "13",
         "비마관" to "3",
         "행림관" to "12"
+    )
+
+    val dorNoToNm = mapOf(
+        "2" to "진리관",
+        "11" to "웅비관",
+        "13" to "자유관",
+        "3" to "비마관",
+        "12" to "행림관"
     )
 
     /** 캠퍼스 위치 */

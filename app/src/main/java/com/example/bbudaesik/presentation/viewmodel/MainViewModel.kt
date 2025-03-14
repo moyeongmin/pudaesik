@@ -27,7 +27,8 @@ data class MainUiState(
     val weekInfo: WeekInfo = getDate(),
     val resturantNames: List<String> = listOf("금정회관학생식당", "학생회관밀양학생식당", "편의동2층양산식당"),
     val isFavorite: List<Boolean> = listOf(false, true, false),
-    val menuData: MutableMap<String, MutableMap<String, String>> = mutableMapOf(),
+    val dorMenuData: MutableMap<String, MutableMap<String, String>> = mutableMapOf(),
+    val resMenuData: MutableMap<String, MutableMap<String, MutableMap<String, String>>> = mutableMapOf()
 )
 
 @HiltViewModel
@@ -44,9 +45,9 @@ class MainViewModel @Inject constructor(
     )
 
     private val restaurantMap = mapOf(
-        0 to listOf("금정회관 학생 식당", "금정회관 교직원 식당", "샛벌회관 식당"),
-        1 to listOf("학생회관(밀양) 학생 식당", "학생회관(밀양) 교직원 식당"),
-        2 to listOf("편의동2층(양산) 식당")
+        0 to listOf("PG002", "PG001", "PS001", "PH002"),//"금정회관 학생 식당", "금정회관 교직원 식당", "샛벌회관 식당", "학생회관 학생 식당"
+        1 to listOf("M001", "M002"),//"학생회관(밀양) 학생 식당", "학생회관(밀양) 교직원 식당"
+        2 to listOf("Y001")//"편의동2층(양산)
     )
 
     private val dormitoryResMap = mapOf(
@@ -83,21 +84,23 @@ class MainViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = "") }
 
             try {
-                val menuDataMap = mutableMapOf<String, MutableMap<String, String>>()
+                val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableMap<String, String>>>()
+                val dorMenuDataMap = mutableMapOf<String, MutableMap<String, String>>()
 
                 // ✅ 식당 데이터 요청 및 변환
-                val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT")
+                val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT",restaurantMap[_uiState.value.cafeteriaSelectedIndex]?: emptyList())
+                Log.d("restaurantResponse", "restaurantResponse: $restaurantResponse")
                 if (restaurantResponse is RestaurantResponse) {
-                    processRestaurantData(restaurantResponse, menuDataMap)
+                    processRestaurantData(restaurantResponse, resMenuDataMap)
+                    _uiState.update { it.copy(isLoading = false, resMenuData = resMenuDataMap) }
                 }
 
                 // ✅ 기숙사 데이터 요청 및 변환
-                val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY")
+                val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY", dormitoryResMap[_uiState.value.cafeteriaSelectedIndex]?: emptyList())
                 if (dormitoryResponse is DormitoryResponse) {
-                    processDormitoryData(dormitoryResponse, menuDataMap)
+                    processDormitoryData(dormitoryResponse, dorMenuDataMap)
+                    _uiState.update { it.copy(isLoading = false, dorMenuData = dorMenuDataMap) }
                 }
-
-                _uiState.update { it.copy(isLoading = false, menuData = menuDataMap) }
 
             } catch (e: Exception) {
                 Log.e("MainViewModel", "fetchMenuData 오류 발생: ${e.message}")
@@ -106,23 +109,45 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun processRestaurantData(response: RestaurantResponse, menuDataMap: MutableMap<String, MutableMap<String, String>>) {
+    private fun processRestaurantData(response: RestaurantResponse, resDataMap: MutableMap<String, MutableMap<String, MutableMap<String, String>>>) {
         response.results.forEach { result ->
-            val restaurantName = result.properties.buildingName?.richText?.firstOrNull()?.text?.content ?: "식당 정보 없음"
-            val mealType = result.properties.menuType?.richText?.firstOrNull()?.text?.content ?: "알 수 없음"
-            val menuContent = result.properties.menuContent?.richText?.firstOrNull()?.text?.content ?: "메뉴 없음"
+            val resCode = result.properties.restaurantCode.rich_text?.firstOrNull()?.plain_text ?: ""
+            val resName = BuildingInfo.resCodeToNm[resCode] ?: "식당 정보 없음"
+            val mealType = result.properties.menuType.rich_text?.firstOrNull()?.plain_text?: ""// 조식 중식 석식 여부
+            val mealTypeText = BuildingInfo.menuTimeCodes[mealType]?: "식사 정보 없음"
+            val mealCost = result.properties.menuTitle.rich_text?.firstOrNull()?.plain_text?: ""
+            val menuContent = result.properties.menuContent.rich_text?.firstOrNull()?.plain_text?: "메뉴 정보 없음"
 
-            menuDataMap.computeIfAbsent(restaurantName) { mutableMapOf() }[mealType] = menuContent
+            Log.d("RestaurantMeal", "[$resName][$mealTypeText][$mealCost] : $menuContent")
+
+            //여기서 데이터를 순서에 맞게 정렬해서 저장하는 방법을 생각 해 봅시다
+            // Pair<식당 이름,Pair<식사 종류,Pair<식사 정보,메뉴 정보>>> 현재는 이 상태
+            //식사 정보와 메뉴 정보를 분리해서 저장하자
+
+
+
+            resDataMap
+                .computeIfAbsent(resName) { mutableMapOf() }
+                .computeIfAbsent(mealTypeText) { mutableMapOf() }
+                .apply {
+                    this["mealCost"] = mealCost
+                    this["menu"] = menuContent
+                }
         }
     }
 
     private fun processDormitoryData(response: DormitoryResponse, menuDataMap: MutableMap<String, MutableMap<String, String>>) {
-        response.results.forEach { result ->
-            val dormitoryName = "기숙사 ${result.properties.dormitoryId?.richText?.firstOrNull()?.text?.content ?: "정보 없음"}"
-            val mealType = result.properties.codeNm?.richText?.firstOrNull()?.text?.content ?: "알 수 없음"
-            val menuContent = result.properties.mealNm?.richText?.firstOrNull()?.text?.content ?: "메뉴 없음"
+        Log.d("processDormitoryData", "response: $response")
+        response.results.forEach { meal ->
+            val dormNo = meal.properties.no.title?.firstOrNull()?.plain_text ?:""
+            val dormName = BuildingInfo.dorNoToNm[dormNo]?: "기숙사 정보 없음"
+            val mealType = meal.properties.codeNm.rich_text?.firstOrNull()?.plain_text ?:""
+            val mealDate = meal.properties.mealDate.rich_text?.firstOrNull()?.plain_text ?:""
+            val mealContent = meal.properties.mealNm.rich_text?.firstOrNull()?.plain_text ?:""
 
-            menuDataMap.computeIfAbsent(dormitoryName) { mutableMapOf() }[mealType] = menuContent
+            Log.d("DormitoryMeal", "$mealDate [$dormName][$mealType] : $mealContent")
+
+            menuDataMap.computeIfAbsent(dormName) { mutableMapOf() }[mealType] = mealContent
         }
     }
     fun onFavoriteClicked(index: Int) {

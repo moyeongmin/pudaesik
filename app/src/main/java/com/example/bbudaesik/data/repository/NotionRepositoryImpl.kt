@@ -16,29 +16,66 @@ class NotionRepositoryImpl(
 ) : NotionRepository {
     private val gson = Gson()
 
-    override suspend fun getMeals(mealDate: String, dbKey: String): Any {
-        val databaseId = databaseIds[dbKey] ?: throw IllegalArgumentException("Invalid database key: $dbKey")
+    override suspend fun getMeals(
+        mealDate: String,
+        dbKey: String,
+        restaurantList: List<String>
+    ): Any {
+        val databaseId =
+            databaseIds[dbKey] ?: throw IllegalArgumentException("Invalid database key: $dbKey")
 
-        val body = when (dbKey) {
-            "RESTAURANT" -> mapOf(
-                "filter" to mapOf(
-                    "property" to "MENU_DATE",
-                    "rich_text" to mapOf("equals" to mealDate)
+        val filter = when (dbKey) {
+            "RESTAURANT" -> {
+                // or 조건으로 식당 리스트 추가
+                val orConditions = restaurantList.map { name ->
+                    mapOf(
+                        "property" to "RESTAURANT_CODE",
+                        "rich_text" to mapOf("equals" to name)
+                    )
+                }
+
+                mapOf(
+                    "and" to listOf(
+                        mapOf(
+                            "property" to "MENU_DATE",
+                            "rich_text" to mapOf("equals" to mealDate)
+                        ),
+                        mapOf("or" to orConditions)
+                    )
                 )
-            )
-            "DORMITORY" -> mapOf(
-                "filter" to mapOf(
-                    "property" to "mealDate",
-                    "rich_text" to mapOf("equals" to mealDate)
+            }
+
+            "DORMITORY" -> {
+                // or 조건으로 기숙사 번호 리스트 추가
+                val orConditions = restaurantList.map { dormNo ->
+                    mapOf(
+                        "property" to "no",
+                        "rich_text" to mapOf("equals" to dormNo)
+                    )
+                }
+
+                mapOf(
+                    "and" to listOf(
+                        mapOf(
+                            "property" to "mealDate",
+                            "rich_text" to mapOf("equals" to mealDate)
+                        ),
+                        mapOf("or" to orConditions)
+                    )
                 )
-            )
+            }
+
             else -> throw IllegalArgumentException("Unsupported dbKey: $dbKey")
         }
 
+        val body = mapOf("filter" to filter)
+
         Log.d("NotionRepositoryImpl", "$dbKey 요청 데이터: ${Gson().toJson(body)}")
 
+
         val responseBody: ResponseBody = api.queryDatabase(databaseId, "Bearer $token", body = body)
-        val responseString = responseBody.string() // JSON String 변환
+        val responseString = responseBody.string()
+        Log.d("NotionRepositoryImpl", "$dbKey 응답 데이터: $responseString")
 
         return when (dbKey) {
             "RESTAURANT" -> gson.fromJson(responseString, RestaurantResponse::class.java)
