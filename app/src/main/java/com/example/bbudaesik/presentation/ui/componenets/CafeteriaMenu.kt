@@ -29,9 +29,9 @@ fun CafeteriaMenu(
             .padding(10.dp),
     ) {
         //기숙사 식단
-        items(resMenuList.size) { index ->
-            val resName = resMenuList.keys.elementAt(index)
-            val mealMap = resMenuList[resName] ?: emptyMap()
+        items(dorMenuList.size) { index ->
+            val resName = dorMenuList.keys.elementAt(index)
+            val mealMap = dorMenuList[resName] ?: emptyMap()
 
             Column(
                 modifier = Modifier
@@ -44,22 +44,18 @@ fun CafeteriaMenu(
                 )
 
                 listOf("조식", "중식", "석식").forEach { mealType ->
-                    val menuContent = mealMap[mealType]?.get("menu")
-                    val mealCost = mealMap[mealType]?.get("mealCost")
-                    Log.d("resmenu", "mealType: $mealType, menuContent: $menuContent, mealCost: $mealCost")
-                    if (!menuContent.isNullOrEmpty()) {
+                    val menu = mealMap[mealType]
+                    if (!menu.isNullOrEmpty()) {
                         Text(
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
                             text = mealType,
                             style = MaterialTheme.typography.titleLarge,
                             color = lightColorScheme().onSurfaceVariant
                         )
-
                         TextBox(
-                            title = mealCost?:"",
-                            content = menuContent.split("\n")
+                            title = null,
+                            content = menu.split("\n")
                         )
-
                         Spacer(modifier = Modifier.padding(10.dp))
                     }
                 }
@@ -95,7 +91,7 @@ fun CafeteriaMenu(
                             color = lightColorScheme().onSurfaceVariant
                         )
                         TextBox(
-                            title = "정식 - ${mealCost ?: "가격 없음"}",
+                            title = mealCost,
                             content = menu.split("\n")
                         )
                         Spacer(modifier = Modifier.padding(10.dp))

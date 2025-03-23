@@ -87,7 +87,6 @@ class MainViewModel @Inject constructor(
                 val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableMap<String, String>>>()
                 val dorMenuDataMap = mutableMapOf<String, MutableMap<String, String>>()
 
-                // ✅ 식당 데이터 요청 및 변환
                 val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT",restaurantMap[_uiState.value.cafeteriaSelectedIndex]?: emptyList())
                 Log.d("restaurantResponse", "restaurantResponse: $restaurantResponse")
                 if (restaurantResponse is RestaurantResponse) {
@@ -95,7 +94,6 @@ class MainViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, resMenuData = resMenuDataMap) }
                 }
 
-                // ✅ 기숙사 데이터 요청 및 변환
                 val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY", dormitoryResMap[_uiState.value.cafeteriaSelectedIndex]?: emptyList())
                 if (dormitoryResponse is DormitoryResponse) {
                     processDormitoryData(dormitoryResponse, dorMenuDataMap)

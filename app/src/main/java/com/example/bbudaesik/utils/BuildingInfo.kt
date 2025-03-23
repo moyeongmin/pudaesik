@@ -12,6 +12,33 @@ object BuildingInfo {
         "학생회관밀양교직원식당" to "M002",
         "편의동2층양산식당" to "Y001"
     )
+    val AppWidgetResMap = mapOf(
+        "금정회관 교직원" to "PG001",
+        "금정회관 학생" to "PG002",
+        "샛벌회관" to "PS001",
+        "편의동 2층" to "Y001",
+        "학생회관 학생" to "PH002",
+        "학생회관(밀양) 교직원" to "M002",
+        "학생회관(밀양) 학생" to "M001",
+        "진리관" to "2",
+        "웅비관" to "11",
+        "자유관" to "13",
+        "비마관" to "3",
+        "행림관" to "12",
+    )
+
+
+    val restaurantMap = mapOf(
+        0 to listOf("PG002", "PG001", "PS001", "PH002"),//"금정회관 학생 식당", "금정회관 교직원 식당", "샛벌회관 식당", "학생회관 학생 식당"
+        1 to listOf("M001", "M002"),//"학생회관(밀양) 학생 식당", "학생회관(밀양) 교직원 식당"
+        2 to listOf("Y001")//"편의동2층(양산)
+    )
+
+    val dormitoryResMap = mapOf(
+        0 to listOf("2", "11", "13"),// 진리관 2 웅비관 11 자유관 13
+        1 to listOf("3"), // 비마관 3
+        2 to listOf("12") // 행림관 12
+    )
 
     val resCodeToNm = mapOf(
         "PG001" to "금정회관 교직원식당",
@@ -29,6 +56,15 @@ object BuildingInfo {
         "양산" to listOf("편의동2층양산식당")
     )
 
+    val resNmToCode = mapOf(
+        "금정회관 교직원" to "PG001",
+        "금정회관학생식당" to "PG002",
+        "샛벌회관식당" to "PS001",
+        "학생회관학생식당" to "PH002",
+        "학생회관밀양학생식당" to "M001",
+        "학생회관밀양교직원식당" to "M002",
+        "편의동2층양산식당" to "Y001"
+    )
     /** 기숙사 코드 */
     val regionDormitories = mapOf(
         "진리관" to "2",

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Bbudaesik</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="app_widget_title">금정회관</string>
+    <string name="app_widget_menu_type">중식</string>
+    <string name="app_widget_menu_detail">탄탄면\n마카로니콘샐러드\n단무지</string>
 </resources>

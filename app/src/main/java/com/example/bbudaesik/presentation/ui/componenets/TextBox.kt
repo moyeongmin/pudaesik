@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextBox(
-    title: String,
+    title: String?,
     content: List<String>,
 ) {
     Column(
@@ -31,11 +31,14 @@ fun TextBox(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(20.dp)
-        )
+        Spacer(modifier = Modifier.padding(20.dp))
+        if(title!=null) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(start = 20.dp)
+            )
+        }
         content.forEach {
             Text(
                 text = it,

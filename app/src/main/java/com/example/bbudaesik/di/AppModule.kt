@@ -8,7 +8,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -37,6 +36,25 @@ object AppModule {
                 "RESTAURANT" to BuildConfig.Restaurant_Db_Id,
                 "DORMITORY" to BuildConfig.Dormitory_Db_Id,
             ),
+        )
+    }
+}
+
+object WidgetHelper {
+    fun provideNotionRepository(): NotionRepository {
+        val api = Retrofit.Builder()
+            .baseUrl(BuildConfig.BaseURL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NotionApiService::class.java)
+
+        return NotionRepositoryImpl(
+            api,
+            BuildConfig.API_KEY,
+            mapOf(
+                "RESTAURANT" to BuildConfig.Restaurant_Db_Id,
+                "DORMITORY" to BuildConfig.Dormitory_Db_Id,
+            )
         )
     }
 }

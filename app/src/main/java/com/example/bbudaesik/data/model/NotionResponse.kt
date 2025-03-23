@@ -38,7 +38,7 @@ data class RichText(
 )
 
 data class RichTextContent(
-    val plain_text: String?
+    val plain_text: String? = ""
 )
 
 data class noTitle(
