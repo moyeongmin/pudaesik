@@ -3,6 +3,7 @@ package com.example.bbudaesik.presentation.ui.widget
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.view.View
 import android.widget.RemoteViews
 import com.example.bbudaesik.R
 import com.example.bbudaesik.data.model.DormitoryResponse
@@ -74,7 +75,13 @@ internal fun updateAppWidget(
                             ?: "메뉴 정보 없음"
 
                     views.setTextViewText(R.id.appwidget_title, selectedRestaurant)
-                    views.setTextViewText(R.id.appwidget_menu_type, "$menuType / $menuCost")
+                    views.setTextViewText(R.id.appwidget_menu_type, menuType)
+                    if (menuCost.isEmpty()) {
+                        views.setViewVisibility(R.id.appwidget_menu_cost, View.GONE)
+                    } else {
+                        views.setViewVisibility(R.id.appwidget_menu_cost, View.VISIBLE)
+                        views.setTextViewText(R.id.appwidget_menu_cost, menuCost)
+                    }
                     views.setTextViewText(R.id.appwidget_menu_detail, menuDetail)
                 } else {
                     views.setTextViewText(R.id.appwidget_title, selectedRestaurant)

@@ -5,4 +5,7 @@
     <string name="app_widget_title">금정회관</string>
     <string name="app_widget_menu_type">중식</string>
     <string name="app_widget_menu_detail">탄탄면\n마카로니콘샐러드\n단무지</string>
+    <string name="app_widget_configure_appname">뿌대식</string>
+    <string name="app_widget_configure_description">메뉴를 좀 더 간편하게 확인해보세요!</string>
+    <string name="app_widget_confirm_btn">확인</string>
 </resources>

@@ -3,52 +3,64 @@
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/widget_background_blue"
+    android:clipToPadding="false"
+    android:elevation="4dp"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@android:color/white">
+    android:padding="16dp">
 
-    <GridLayout
+    <!-- 상단 텍스트 줄 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:columnCount="3"
-        android:rowCount="1"
-        android:layout_marginBottom="4dp">
+        android:paddingBottom="4dp">
 
+        <!-- 식당 이름 (타이틀) -->
         <TextView
             android:id="@+id/appwidget_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_columnSpan="2"
-            android:layout_gravity="fill"
-            android:gravity="start|center_vertical"
-            android:text="@string/app_widget_title"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end" />
+            android:text="@string/app_widget_title"
+            android:textColor="@color/widget_title_blue"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
+        <!-- 식사 종류 / 가격 -->
         <TextView
             android:id="@+id/appwidget_menu_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_columnSpan="2"
-            android:layout_gravity="fill"
-            android:gravity="start|center_vertical"
-            android:text="@string/app_widget_menu_type"
-            android:textSize="14sp"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end" />
-    </GridLayout>
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/app_widget_menu_type"
+            android:textColor="@color/widget_type_blue"
+            android:textSize="18sp" />
+    </LinearLayout>
 
+    <TextView
+        android:id="@+id/appwidget_menu_cost"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:text=""
+        android:textSize="18sp"
+        android:paddingBottom="4dp"/>
+
+    <!-- 식단 상세 정보 -->
     <TextView
         android:id="@+id/appwidget_menu_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:ellipsize="end"
         android:gravity="top"
+        android:lineSpacingExtra="4dp"
         android:text="@string/app_widget_menu_detail"
-        android:textSize="12sp"
-        android:maxLines="3"
-        android:ellipsize="end" />
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 </LinearLayout>
