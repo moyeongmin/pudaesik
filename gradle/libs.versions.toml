@@ -6,6 +6,7 @@ gson = "2.10.1"
 hiltAndroidVersion = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 lifecycleRuntimeCompose = "2.8.7"
+lottieCompose = "5.2.0"
 navigationRuntimeKtx = "2.8.5"
 navigationCompose = "2.8.5"
 
@@ -42,6 +43,8 @@ ksp = "2.0.21-1.0.25"
 constraintlayout = "2.2.1"
 cardview = "1.0.0"
 
+#animation
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
@@ -66,6 +69,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 

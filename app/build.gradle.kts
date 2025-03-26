@@ -92,6 +92,7 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.gson)
     implementation(libs.converter.gson)
+    implementation(libs.lottie.compose)
 
 }
 

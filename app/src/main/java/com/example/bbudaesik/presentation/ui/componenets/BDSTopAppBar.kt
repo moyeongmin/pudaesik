@@ -1,11 +1,15 @@
 package com.example.bbudaesik.presentation.ui.componenets
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -20,7 +24,10 @@ import com.example.bbudaesik.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BDSTopAppBar() {
+fun BDSTopAppBar(
+    showDialog: () -> Unit,
+
+) {
     TopAppBar(
         title = {
             Text(
@@ -30,7 +37,6 @@ fun BDSTopAppBar() {
         },
         navigationIcon = {
             Icon(
-
                 imageVector = ImageVector.vectorResource(id = R.drawable.logo),
                 contentDescription = "logo",
                 tint = Color.Unspecified,
@@ -41,14 +47,18 @@ fun BDSTopAppBar() {
                 )
         },
         actions = {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "search",
-                modifier = Modifier
-                    .size(36.dp)
-                    .padding(end = 10.dp),
-                tint = Color(0xFF00AAFF),
-            )
+            IconButton(
+                onClick = {showDialog()}
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "search",
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(end = 10.dp),
+                    tint = Color(0xFF00AAFF),
+                )
+            }
         }
 
     )
@@ -57,5 +67,7 @@ fun BDSTopAppBar() {
 @Preview
 @Composable
 private fun BDSTopAppBarPreview() {
-    BDSTopAppBar()
+    BDSTopAppBar(
+        showDialog = {}
+    )
 }
