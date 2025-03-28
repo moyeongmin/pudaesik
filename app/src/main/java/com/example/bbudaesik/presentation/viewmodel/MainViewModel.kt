@@ -35,7 +35,6 @@ data class MainUiState(
     val sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>> = emptyList(),
 )
 
-// 저장한 즐겨찾기가 제대로 반영되지 않음 -> 수정 필요
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: NotionRepository,
@@ -45,27 +44,9 @@ class MainViewModel @Inject constructor(
     val uiState: StateFlow<MainUiState> = _uiState
     private val prefs = application.getSharedPreferences("bbudaesik_prefs", Context.MODE_PRIVATE)//application의 context를 사용하기 때문에 안전
 
-    private val regionMap = mapOf(
-        0 to "부산",
-        1 to "밀양",
-        2 to "양산"
-    )
-
-    private val restaurantMap = mapOf(
-        0 to listOf("PG002", "PG001", "PS001", "PH002"),//"금정회관 학생 식당", "금정회관 교직원 식당", "샛벌회관 식당", "학생회관 학생 식당"
-        1 to listOf("M001", "M002"),//"학생회관(밀양) 학생 식당", "학생회관(밀양) 교직원 식당"
-        2 to listOf("Y001")//"편의동2층(양산)
-    )
-
-    private val dormitoryResMap = mapOf(
-        0 to listOf("2", "11", "13"),// 진리관 2 웅비관 11 자유관 13
-        1 to listOf("3"), // 비마관 3
-        2 to listOf("12") // 행림관 12
-    )
-
     init {
         val savedIndex = prefs.getInt("default_region", 0)
-        val favoriteSet = prefs.getStringSet("favorite_names", emptySet()) ?: emptySet()
+        val favoriteSet = getFavoriteNames()
         val initialDate = _uiState.value.weekInfo.currentDate
 
         _uiState.update {
@@ -123,13 +104,13 @@ class MainViewModel @Inject constructor(
                 val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableMap<String, String>>>()
                 val dorMenuDataMap = mutableMapOf<String, MutableMap<String, String>>()
 
-                val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT", restaurantMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
+                val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT", BuildingInfo.restaurantMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
                 if (restaurantResponse is RestaurantResponse) {
                     processRestaurantData(restaurantResponse, resMenuDataMap)
                     _uiState.update { it.copy(resMenuData = resMenuDataMap) }
                 }
 
-                val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY", dormitoryResMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
+                val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY", BuildingInfo.dormitoryResMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
                 if (dormitoryResponse is DormitoryResponse) {
                     processDormitoryData(dormitoryResponse, dorMenuDataMap)
                     _uiState.update { it.copy(dorMenuData = dorMenuDataMap) }

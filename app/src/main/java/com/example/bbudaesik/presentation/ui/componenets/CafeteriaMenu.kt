@@ -62,7 +62,7 @@ fun CafeteriaMenu(
 
                 listOf("조식", "중식", "석식").forEach { mealType ->
                     val menu = mealMap[mealType]?.get("menu")
-                        ?: mealMap[mealType]?.get("MENU") // 기숙사는 대문자 키일 수 있음
+                        ?: mealMap[mealType]?.get("MENU")
                     val mealCost = mealMap[mealType]?.get("mealCost")
 
                     if (!menu.isNullOrEmpty()) {
