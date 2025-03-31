@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">Bbudaesik</string>
+    <string name="app_name">뿌대식</string>
     <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
+    <string name="app_widget_description">귀여워요!</string>
     <string name="app_widget_title">금정회관</string>
     <string name="app_widget_menu_type">중식</string>
     <string name="app_widget_menu_detail">탄탄면\n마카로니콘샐러드\n단무지</string>
     <string name="app_widget_configure_appname">뿌대식</string>
     <string name="app_widget_configure_description">메뉴를 좀 더 간편하게 확인해보세요!</string>
     <string name="app_widget_confirm_btn">확인</string>
+    <string name="spinner_item_label">식당</string>
+    <string name="spinner_item_text">금정회관 학생</string>
 </resources>

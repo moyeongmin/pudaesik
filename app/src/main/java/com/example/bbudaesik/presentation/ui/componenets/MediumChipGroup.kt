@@ -1,6 +1,5 @@
 package com.example.bbudaesik.presentation.ui.componenets
 
-import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,42 +35,44 @@ fun MediumChipGroup(
     subtitles: List<Int>,
     selectedDate: Int,
     onChipClicked: (Int) -> Unit,
-    currentDate: Int
+    currentDate: Int,
 ) {
-
     val interactionSource = remember { MutableInteractionSource() }
     var chipPositions by remember { mutableStateOf(List(titles.size) { Pair(0f, 0f) }) }
     val selectedIndex = subtitles.indexOf(selectedDate)
     val indicatorOffset by animateDpAsState(
         targetValue = calIndicatorOffset(selectedIndex, chipPositions, LocalDensity.current),
-        label = "IndicatorAnimation"
+        label = "IndicatorAnimation",
     )
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
     ) {
         titles.forEachIndexed { index, title ->
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(0.8f)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { Log.d("test", "index: ${subtitles[index]}");
-                        onChipClicked(subtitles[index]) }
-                    .onGloballyPositioned { layoutCoordinates: LayoutCoordinates ->
-                        val x = layoutCoordinates.positionInParent().x
-                        val width = layoutCoordinates.size.width
-                        chipPositions = chipPositions
-                            .toMutableList()
-                            .also {
-                                it[index] = Pair(x, width.toFloat())
-                            }
-                    },
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .aspectRatio(0.8f)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                        ) {
+                            onChipClicked(subtitles[index])
+                        }.onGloballyPositioned { layoutCoordinates: LayoutCoordinates ->
+                            val x = layoutCoordinates.positionInParent().x
+                            val width = layoutCoordinates.size.width
+                            chipPositions =
+                                chipPositions
+                                    .toMutableList()
+                                    .also {
+                                        it[index] = Pair(x, width.toFloat())
+                                    }
+                        },
+                contentAlignment = Alignment.Center,
             ) {
                 MediumChip(
                     day = title,
@@ -82,25 +83,25 @@ fun MediumChipGroup(
         }
     }
     Box(
-        modifier = Modifier
-            .offset { IntOffset(indicatorOffset.roundToPx(), 0) }
-            .padding(top = 4.dp)
-            .size(6.dp)
-            .clip(CircleShape)
-            .background(Color(0xFF00AAFF))
+        modifier =
+            Modifier
+                .offset { IntOffset(indicatorOffset.roundToPx(), 0) }
+                .padding(top = 4.dp)
+                .size(6.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF00AAFF)),
     )
 }
 
 fun calIndicatorOffset(
     index: Int,
     chipPositions: List<Pair<Float, Float>>,
-    density: androidx.compose.ui.unit.Density
+    density: androidx.compose.ui.unit.Density,
 ): androidx.compose.ui.unit.Dp {
     if (index < 0 || index >= chipPositions.size) return 0.dp
 
     val (x, width) = chipPositions[index]
     val centerX = x + (width / 2)
-
 
     return with(density) { centerX.toDp() } - 3.dp
 }

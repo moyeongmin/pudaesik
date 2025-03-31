@@ -1,6 +1,5 @@
 package com.example.bbudaesik.data.repository
 
-import android.util.Log
 import com.example.bbudaesik.data.model.DormitoryResponse
 import com.example.bbudaesik.data.model.RestaurantResponse
 import com.example.bbudaesik.data.remote.NotionApiService
@@ -23,56 +22,57 @@ class NotionRepositoryImpl(
         val databaseId =
             databaseIds[dbKey] ?: throw IllegalArgumentException("Invalid database key: $dbKey")
 
-        val filter = when (dbKey) {
-            "RESTAURANT" -> {
-                val orConditions = restaurantList.map { name ->
+        val filter =
+            when (dbKey) {
+                "RESTAURANT" -> {
+                    val orConditions =
+                        restaurantList.map { name ->
+                            mapOf(
+                                "property" to "RESTAURANT_CODE",
+                                "rich_text" to mapOf("equals" to name),
+                            )
+                        }
+
                     mapOf(
-                        "property" to "RESTAURANT_CODE",
-                        "rich_text" to mapOf("equals" to name)
+                        "and" to
+                            listOf(
+                                mapOf(
+                                    "property" to "MENU_DATE",
+                                    "rich_text" to mapOf("equals" to mealDate),
+                                ),
+                                mapOf("or" to orConditions),
+                            ),
                     )
                 }
 
-                mapOf(
-                    "and" to listOf(
-                        mapOf(
-                            "property" to "MENU_DATE",
-                            "rich_text" to mapOf("equals" to mealDate)
-                        ),
-                        mapOf("or" to orConditions)
-                    )
-                )
-            }
+                "DORMITORY" -> {
+                    val orConditions =
+                        restaurantList.map { dormNo ->
+                            mapOf(
+                                "property" to "no",
+                                "rich_text" to mapOf("equals" to dormNo),
+                            )
+                        }
 
-            "DORMITORY" -> {
-                val orConditions = restaurantList.map { dormNo ->
                     mapOf(
-                        "property" to "no",
-                        "rich_text" to mapOf("equals" to dormNo)
+                        "and" to
+                            listOf(
+                                mapOf(
+                                    "property" to "mealDate",
+                                    "rich_text" to mapOf("equals" to mealDate),
+                                ),
+                                mapOf("or" to orConditions),
+                            ),
                     )
                 }
 
-                mapOf(
-                    "and" to listOf(
-                        mapOf(
-                            "property" to "mealDate",
-                            "rich_text" to mapOf("equals" to mealDate)
-                        ),
-                        mapOf("or" to orConditions)
-                    )
-                )
+                else -> throw IllegalArgumentException("Unsupported dbKey: $dbKey")
             }
-
-            else -> throw IllegalArgumentException("Unsupported dbKey: $dbKey")
-        }
 
         val body = mapOf("filter" to filter)
 
-        Log.d("NotionRepositoryImpl", "$dbKey 요청 데이터: ${Gson().toJson(body)}")
-
-
         val responseBody: ResponseBody = api.queryDatabase(databaseId, "Bearer $token", body = body)
         val responseString = responseBody.string()
-        Log.d("NotionRepositoryImpl", "$dbKey 응답 데이터: $responseString")
 
         return when (dbKey) {
             "RESTAURANT" -> gson.fromJson(responseString, RestaurantResponse::class.java)

@@ -23,27 +23,28 @@ fun TextBox(
     content: List<String>,
 ) {
     Column(
-        modifier = Modifier
-            .padding(horizontal = 15.dp)
-            .shadow(3.dp, shape = RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .background(lightColorScheme().onPrimary)
-            .fillMaxWidth()
-            .wrapContentHeight()
+        modifier =
+            Modifier
+                .padding(horizontal = 15.dp)
+                .shadow(3.dp, shape = RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .background(lightColorScheme().onPrimary)
+                .fillMaxWidth()
+                .wrapContentHeight(),
     ) {
         Spacer(modifier = Modifier.padding(20.dp))
-        if(title!=null) {
+        if (title != null && title != "") {
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(start = 20.dp)
+                modifier = Modifier.padding(start = 20.dp, bottom = 10.dp),
             )
         }
         content.forEach {
             Text(
                 text = it,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
             )
         }
         Spacer(modifier = Modifier.padding(20.dp))
@@ -55,6 +56,6 @@ fun TextBox(
 private fun TextBoxPreview() {
     TextBox(
         title = "Title",
-        content = listOf("content1", "content2", "content3")
+        content = listOf("content1", "content2", "content3"),
     )
 }

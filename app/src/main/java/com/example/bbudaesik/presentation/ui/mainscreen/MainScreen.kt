@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -34,17 +33,14 @@ import com.example.bbudaesik.utils.WeekInfo
 import com.example.bbudaesik.utils.getDate
 
 @Composable
-fun MainScreen(
-    navController: NavHostController,
-    viewModel: MainViewModel = hiltViewModel(),
-) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val weekInfo = getDate()
-    if (uiState.showDialog){
+    if (uiState.showDialog) {
         OptionDialog(
             shownDialog = { viewModel.shownDialog() },
-            onDefaultRegionSelected = { viewModel.saveDefaultRegion(it)},
+            onDefaultRegionSelected = { viewModel.saveDefaultRegion(it) },
             initialSelectedIndex = uiState.cafeteriaSelectedIndex,
         )
     }
@@ -53,7 +49,6 @@ fun MainScreen(
         selectedCafeteria = uiState.cafeteriaSelectedIndex,
         selectedDate = uiState.selectedDate,
         weekInfo = weekInfo,
-        resturantName = uiState.resturantNames,
         sortedResMenuList = uiState.sortedResMenuList,
         isLoading = uiState.isLoading,
         error = uiState.error,
@@ -69,7 +64,6 @@ fun MainScreen(
     selectedCafeteria: Int,
     selectedDate: Int,
     weekInfo: WeekInfo,
-    resturantName: List<String>,
     sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>>,
     isLoading: Boolean,
     error: String,
@@ -79,9 +73,10 @@ fun MainScreen(
     showDialog: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp),
     ) {
         BDSTopAppBar(showDialog)
         LargeChipGroup(
@@ -100,7 +95,7 @@ fun MainScreen(
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             thickness = 1.dp,
-            color = Color(0xFFC2C2C4)
+            color = Color(0xFFC2C2C4),
         )
         if (isLoading) {
             val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
@@ -112,25 +107,24 @@ fun MainScreen(
                     modifier = Modifier.align(Alignment.Center),
                 ) {
                     LottieAnimation(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .align(Alignment.CenterHorizontally),
+                        modifier =
+                            Modifier
+                                .size(100.dp)
+                                .align(Alignment.CenterHorizontally),
                         composition = composition,
                         progress = { progress },
                     )
                     Text(text = "식당으로 들어가고 있어요!", modifier = Modifier.padding(16.dp))
-
                 }
             }
         } else if (error.isNotEmpty()) {
             Text(
                 text = "오류: $error!\n 다시 시도해주세요!",
                 color = Color.Red,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         } else {
             CafeteriaMenu(
-                resturantName = resturantName,
                 onFavoriteClicked = onFavoriteClicked,
                 fullMenuList = sortedResMenuList,
             )
@@ -147,11 +141,11 @@ private fun MainScreenPreview() {
             MainScreen(
                 selectedCafeteria = 0,
                 selectedDate = 0,
-                weekInfo = WeekInfo(
-                    currentDate = 0,
-                    dates = listOf(0, 1, 2, 3, 4, 5, 6),
-                ),
-                resturantName = listOf("학생식당", "교직원식당"),
+                weekInfo =
+                    WeekInfo(
+                        currentDate = 0,
+                        dates = listOf(0, 1, 2, 3, 4, 5, 6),
+                    ),
                 onCafeteriaClicked = {},
                 onDateClicked = {},
                 onFavoriteClicked = {},

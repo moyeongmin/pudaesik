@@ -18,7 +18,7 @@ fun getDate(): WeekInfo {
 
     for (i in 0..6) {
         weekDates.add(calendar.get(Calendar.DAY_OF_MONTH))
-        calendar.add(Calendar.DAY_OF_MONTH, 1) // 다음 날로 이동
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
     }
 
     return WeekInfo(

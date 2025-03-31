@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("org.jlleitschuh.gradle.ktlint").version("12.1.0")
 }
 
 var properties = Properties()
@@ -35,7 +36,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -75,14 +76,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
     implementation(libs.kotlinx.coroutines)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
-
 
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -93,7 +92,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.converter.gson)
     implementation(libs.lottie.compose)
-
 }
 
 kapt {

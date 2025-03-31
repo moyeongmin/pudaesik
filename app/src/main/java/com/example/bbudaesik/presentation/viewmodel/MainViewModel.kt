@@ -2,7 +2,6 @@ package com.example.bbudaesik.presentation.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bbudaesik.data.model.DormitoryResponse
@@ -31,157 +30,203 @@ data class MainUiState(
     val favoriteNames: Set<String> = emptySet(),
     val showDialog: Boolean = false,
     val dorMenuData: MutableMap<String, MutableMap<String, String>> = mutableMapOf(),
-    val resMenuData: MutableMap<String, MutableMap<String, MutableMap<String, String>>> = mutableMapOf(),
+    val resMenuData: MutableMap<String, MutableMap<String, MutableList<Pair<String, String>>>> = mutableMapOf(),
     val sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>> = emptyList(),
 )
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    private val repository: NotionRepository,
-    application: Application,
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(MainUiState())
-    val uiState: StateFlow<MainUiState> = _uiState
-    private val prefs = application.getSharedPreferences("bbudaesik_prefs", Context.MODE_PRIVATE)//application의 context를 사용하기 때문에 안전
+class MainViewModel
+    @Inject
+    constructor(
+        private val repository: NotionRepository,
+        application: Application,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(MainUiState())
+        val uiState: StateFlow<MainUiState> = _uiState
+        private val prefs = application.getSharedPreferences("bbudaesik_prefs", Context.MODE_PRIVATE) // application의 context를 사용하기 때문에 안전
 
-    init {
-        val savedIndex = prefs.getInt("default_region", 0)
-        val favoriteSet = getFavoriteNames()
-        val initialDate = _uiState.value.weekInfo.currentDate
+        init {
+            val savedIndex = prefs.getInt("default_region", 0)
+            val favoriteSet = getFavoriteNames()
+            val initialDate = _uiState.value.weekInfo.currentDate
 
-        _uiState.update {
-            it.copy(
-                selectedDate = initialDate,
-                cafeteriaSelectedIndex = savedIndex,
-                favoriteNames = favoriteSet
-            )
+            _uiState.update {
+                it.copy(
+                    selectedDate = initialDate,
+                    cafeteriaSelectedIndex = savedIndex,
+                    favoriteNames = favoriteSet,
+                )
+            }
+            fetchMenuData()
         }
-        fetchMenuData()
-    }
 
-    fun onCafeteriaClicked(index: Int) {
-        _uiState.update { it.copy(cafeteriaSelectedIndex = index) }
-        fetchMenuData()
-    }
+        fun onCafeteriaClicked(index: Int) {
+            _uiState.update { it.copy(cafeteriaSelectedIndex = index) }
+            fetchMenuData()
+        }
 
-    fun onDateClicked(index: Int) {
-        _uiState.update { it.copy(selectedDate = index) }
-        fetchMenuData()
-    }
-    private fun getFormattedDate(): String {
-        val calendar = Calendar.getInstance()
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return dateFormatter.format(calendar.time)
-    }
+        fun onDateClicked(index: Int) {
+            _uiState.update { it.copy(selectedDate = index) }
+            fetchMenuData()
+        }
 
-    fun showDialog() {
-        _uiState.update { it.copy(showDialog = true) }
-    }
+        private fun getFormattedDate(): String {
+            val calendar = Calendar.getInstance()
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            return dateFormatter.format(calendar.time)
+        }
 
-    fun shownDialog() {
-        _uiState.update { it.copy(showDialog = false) }
-    }
+        fun showDialog() {
+            _uiState.update { it.copy(showDialog = true) }
+        }
 
-    fun saveDefaultRegion(index: Int) {
-        prefs.edit().putInt("default_region", index).apply()
-    }
+        fun shownDialog() {
+            _uiState.update { it.copy(showDialog = false) }
+        }
 
-    private fun saveFavoriteNames(favorites: Set<String>) {
-        prefs.edit().putStringSet("\\favorite_names\\", favorites).apply()
-    }
+        fun saveDefaultRegion(index: Int) {
+            prefs.edit().putInt("default_region", index).apply()
+        }
 
-    private fun getFavoriteNames(): Set<String> {
-        return prefs.getStringSet("\\favorite_names\\", emptySet()) ?: emptySet()
-    }
+        private fun saveFavoriteNames(favorites: Set<String>) {
+            prefs.edit().putStringSet("\\favorite_names\\", favorites).apply()
+        }
 
-    private fun fetchMenuData() {
-        val formattedDate = getFormattedDate()
+        private fun getFavoriteNames(): Set<String> = prefs.getStringSet("\\favorite_names\\", emptySet()) ?: emptySet()
 
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = "") }
+        private fun fetchMenuData() {
+            val formattedDate = getFormattedDate()
 
-            try {
-                val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableMap<String, String>>>()
-                val dorMenuDataMap = mutableMapOf<String, MutableMap<String, String>>()
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true, error = "") }
 
-                val restaurantResponse = repository.getMeals(formattedDate, "RESTAURANT", BuildingInfo.restaurantMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
-                if (restaurantResponse is RestaurantResponse) {
-                    processRestaurantData(restaurantResponse, resMenuDataMap)
-                    _uiState.update { it.copy(resMenuData = resMenuDataMap) }
+                try {
+                    val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableList<Pair<String, String>>>>()
+                    val dorMenuDataMap = mutableMapOf<String, MutableMap<String, String>>()
+
+                    val restaurantResponse =
+                        repository.getMeals(
+                            formattedDate,
+                            "RESTAURANT",
+                            BuildingInfo.restaurantMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList(),
+                        )
+                    if (restaurantResponse is RestaurantResponse) {
+                        processRestaurantData(restaurantResponse, resMenuDataMap)
+                        _uiState.update { it.copy(resMenuData = resMenuDataMap) }
+                    }
+
+                    val dormitoryResponse =
+                        repository.getMeals(
+                            formattedDate,
+                            "DORMITORY",
+                            BuildingInfo.dormitoryResMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList(),
+                        )
+                    if (dormitoryResponse is DormitoryResponse) {
+                        processDormitoryData(dormitoryResponse, dorMenuDataMap)
+                        _uiState.update { it.copy(dorMenuData = dorMenuDataMap) }
+                    }
+
+                    updateFullMenuList()
+                    _uiState.update { it.copy(isLoading = false) }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "데이터를 불러오는 데 실패했습니다.") }
                 }
-
-                val dormitoryResponse = repository.getMeals(formattedDate, "DORMITORY", BuildingInfo.dormitoryResMap[_uiState.value.cafeteriaSelectedIndex] ?: emptyList())
-                if (dormitoryResponse is DormitoryResponse) {
-                    processDormitoryData(dormitoryResponse, dorMenuDataMap)
-                    _uiState.update { it.copy(dorMenuData = dorMenuDataMap) }
-                }
-
-                updateFullMenuList()
-                _uiState.update { it.copy(isLoading = false) }
-            } catch (e: Exception) {
-                Log.e("MainViewModel", "fetchMenuData 오류 발생: ${e.message}")
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "데이터를 불러오는 데 실패했습니다.") }
             }
         }
-    }
 
+        private fun updateFullMenuList() {
+            val resMenus =
+                _uiState.value.resMenuData.map { (name, mealMap) ->
+                    val convertedMealMap =
+                        mealMap.mapValues { entry ->
+                            val menuList = entry.value
+                            mapOf(
+                                "menu" to
+                                    menuList.joinToString("\n") { (cost, menu) ->
+                                        if (cost.isNotBlank()) "[$cost]\n$menu" else menu
+                                    },
+                            )
+                        }
 
-
-    private fun updateFullMenuList() {
-        val resMenus = _uiState.value.resMenuData.map { (name, map) ->
-            Triple(name, isFavorite(name), map)
-        }
-        val dorMenus = _uiState.value.dorMenuData.map { (name, map) ->
-            val wrapped = map.mapValues { mapOf("menu" to it.value) }
-            Triple(name, isFavorite(name), wrapped)
-        }
-
-        val combined = (resMenus + dorMenus).sortedWith(
-            compareByDescending<Triple<String, Boolean, Map<String, Map<String, String>>>> { it.second }
-                .thenBy { it.first }
-        )
-        _uiState.update { it.copy(sortedResMenuList = combined) }
-    }
-
-    private fun isFavorite(name: String): Boolean {
-        return name in _uiState.value.favoriteNames
-    }
-
-    private fun processRestaurantData(response: RestaurantResponse, resDataMap: MutableMap<String, MutableMap<String, MutableMap<String, String>>>) {
-        response.results.forEach { result ->
-            val resCode = result.properties.restaurantCode.rich_text?.firstOrNull()?.plain_text ?: ""
-            val resName = BuildingInfo.resCodeToNm[resCode] ?: "식당 정보 없음"
-            val mealType = result.properties.menuType.rich_text?.firstOrNull()?.plain_text ?: ""
-            val mealTypeText = BuildingInfo.menuTimeCodes[mealType] ?: "식사 정보 없음"
-            val mealCost = result.properties.menuTitle.rich_text?.firstOrNull()?.plain_text ?: ""
-            val menuContent = result.properties.menuContent.rich_text?.firstOrNull()?.plain_text ?: "메뉴 정보 없음"
-
-            resDataMap
-                .computeIfAbsent(resName) { mutableMapOf() }
-                .computeIfAbsent(mealTypeText) { mutableMapOf() }
-                .apply {
-                    this["mealCost"] = mealCost
-                    this["menu"] = menuContent
+                    Triple(name, isFavorite(name), convertedMealMap)
                 }
+
+            val dorMenus =
+                _uiState.value.dorMenuData.map { (name, map) ->
+                    val wrapped = map.mapValues { mapOf("menu" to it.value) }
+                    Triple(name, isFavorite(name), wrapped)
+                }
+
+            val combined =
+                (resMenus + dorMenus).sortedWith(
+                    compareByDescending<Triple<String, Boolean, Map<String, Map<String, String>>>> { it.second }
+                        .thenBy { it.first },
+                )
+
+            _uiState.update { it.copy(sortedResMenuList = combined) }
+        }
+
+        private fun isFavorite(name: String): Boolean = name in _uiState.value.favoriteNames
+
+        private fun processRestaurantData(
+            response: RestaurantResponse,
+            resDataMap: MutableMap<String, MutableMap<String, MutableList<Pair<String, String>>>>,
+        ) {
+            response.results.forEach { result ->
+                val resCode =
+                    result.properties.restaurantCode.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+                val resName = BuildingInfo.resCodeToNm[resCode] ?: "식당 정보 없음"
+                val mealType =
+                    result.properties.menuType.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+                val mealTypeText = BuildingInfo.menuTimeCodes[mealType] ?: "식사 정보 없음"
+                val mealCost =
+                    result.properties.menuTitle.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+                val menuContent =
+                    result.properties.menuContent.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: "메뉴 정보 없음"
+
+                resDataMap
+                    .computeIfAbsent(resName) { mutableMapOf() }
+                    .computeIfAbsent(mealTypeText) { mutableListOf() }
+                    .add(mealCost to menuContent)
+            }
+        }
+
+        private fun processDormitoryData(
+            response: DormitoryResponse,
+            menuDataMap: MutableMap<String, MutableMap<String, String>>,
+        ) {
+            response.results.forEach { meal ->
+                val dormNo =
+                    meal.properties.no.title
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+                val dormName = BuildingInfo.dorNoToNm[dormNo] ?: "기숙사 정보 없음"
+                val mealType =
+                    meal.properties.codeNm.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+                val mealContent =
+                    meal.properties.mealNm.rich_text
+                        ?.firstOrNull()
+                        ?.plain_text ?: ""
+
+                menuDataMap.computeIfAbsent(dormName) { mutableMapOf() }[mealType] = mealContent
+            }
+        }
+
+        fun onFavoriteClicked(name: String) {
+            val current = _uiState.value.favoriteNames
+            val updated = if (name in current) current - name else current + name
+            saveFavoriteNames(updated)
+            _uiState.update { it.copy(favoriteNames = updated) }
+            updateFullMenuList()
         }
     }
-
-    private fun processDormitoryData(response: DormitoryResponse, menuDataMap: MutableMap<String, MutableMap<String, String>>) {
-        response.results.forEach { meal ->
-            val dormNo = meal.properties.no.title?.firstOrNull()?.plain_text ?: ""
-            val dormName = BuildingInfo.dorNoToNm[dormNo] ?: "기숙사 정보 없음"
-            val mealType = meal.properties.codeNm.rich_text?.firstOrNull()?.plain_text ?: ""
-            val mealContent = meal.properties.mealNm.rich_text?.firstOrNull()?.plain_text ?: ""
-
-            menuDataMap.computeIfAbsent(dormName) { mutableMapOf() }[mealType] = mealContent
-        }
-    }
-
-    fun onFavoriteClicked(name: String) {
-        val current = _uiState.value.favoriteNames
-        val updated = if (name in current) current - name else current + name
-        saveFavoriteNames(updated)
-        _uiState.update { it.copy(favoriteNames = updated) }
-        updateFullMenuList()
-    }
-}
