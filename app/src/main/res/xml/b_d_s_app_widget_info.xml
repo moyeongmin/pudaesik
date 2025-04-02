@@ -7,7 +7,7 @@
     android:minHeight="80dp"
     android:previewImage="@mipmap/ic_launcher_round"
     android:resizeMode="horizontal|vertical"
-    android:configure="com.example.bbudaesik.presentation.ui.widget.BDSAppWidgetConfigureActivity"
+    android:configure="com.mo.bbudaesik.presentation.ui.widget.BDSAppWidgetConfigureActivity"
     android:targetCellWidth="3"
     android:targetCellHeight="1"
     android:updatePeriodMillis="3600000"

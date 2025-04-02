@@ -14,15 +14,15 @@ var properties = Properties()
 properties.load(FileInputStream("local.properties"))
 
 android {
-    namespace = "com.example.bbudaesik"
+    namespace = "com.mo.bbudaesik"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.bbudaesik"
+        applicationId = "com.mo.bbudaesik"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BaseURL", properties.getProperty("base_url"))
@@ -33,7 +33,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
