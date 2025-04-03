@@ -10,7 +10,7 @@
 # class:
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
-#}
+#
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Gson에서 사용하는 모델 클래스들 보존
+-keep class com.mo.bbudaesik.data.model.** { *; }
