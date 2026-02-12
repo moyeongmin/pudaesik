@@ -34,7 +34,7 @@ import com.mo.bbudaesik.utils.WeekInfo
 import com.mo.bbudaesik.utils.getDate
 
 @Composable
-fun mainScreen(viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val weekInfo = getDate()
@@ -46,7 +46,7 @@ fun mainScreen(viewModel: MainViewModel = hiltViewModel()) {
         )
     }
 
-    mainScreen(
+    MainScreen(
         selectedCafeteria = uiState.cafeteriaSelectedIndex,
         selectedDate = uiState.selectedDate,
         weekInfo = weekInfo,
@@ -59,7 +59,7 @@ fun mainScreen(viewModel: MainViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun mainScreen(
+fun MainScreen(
     selectedCafeteria: Int,
     selectedDate: Int,
     content: MainContent,
@@ -94,7 +94,7 @@ fun mainScreen(
             thickness = 1.dp,
             color = Color(0xFFC2C2C4),
         )
-        when (val content = content) {
+        when (content) {
             MainContent.Loading -> {
                 val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
                 val progress by animateLottieCompositionAsState(composition)
@@ -142,7 +142,7 @@ fun mainScreen(
 private fun MainScreenPreview() {
     BbudaesikTheme {
         Scaffold {
-            mainScreen(
+            MainScreen(
                 selectedCafeteria = 0,
                 selectedDate = 0,
                 weekInfo =
