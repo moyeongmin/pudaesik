@@ -94,46 +94,68 @@ fun MainScreen(
             thickness = 1.dp,
             color = Color(0xFFC2C2C4),
         )
-        when (content) {
-            MainContent.Loading -> {
-                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
-                val progress by animateLottieCompositionAsState(composition)
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                    ) {
-                        LottieAnimation(
-                            modifier =
-                                Modifier
-                                    .size(100.dp)
-                                    .align(Alignment.CenterHorizontally),
-                            composition = composition,
-                            progress = { progress },
-                        )
-                        Text(text = "식당으로 들어가고 있어요!", modifier = Modifier.padding(16.dp))
-                    }
-                }
-            }
-            is MainContent.Error ->
-                Text(
-                    text = "오류: ${content.message}!\n 다시 시도해주세요!",
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp),
-                )
-            is MainContent.Menu ->
-                CafeteriaMenu(
-                    onFavoriteClicked = onFavoriteClicked,
-                    fullMenuList = content.sortedResMenuList,
-                )
-            MainContent.Empty ->
-                Text(
-                    text = "선택한 날짜에 식단 정보가 없어요!",
-                    modifier = Modifier.padding(16.dp),
-                )
+        MainContentSection(
+            content = content,
+            onFavoriteClicked = onFavoriteClicked,
+        )
+    }
+}
+
+@Composable
+private fun MainContentSection(
+    content: MainContent,
+    onFavoriteClicked: (String) -> Unit,
+) {
+    when (content) {
+        MainContent.Loading -> LoadingSection()
+
+        is MainContent.Error ->
+            ErrorSection(
+                message = content.message,
+            )
+
+        is MainContent.Menu ->
+            CafeteriaMenu(
+                onFavoriteClicked = onFavoriteClicked,
+                fullMenuList = content.sortedResMenuList,
+            )
+
+        MainContent.Empty -> EmptySection()
+    }
+}
+
+@Composable
+private fun LoadingSection() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+    val progress by animateLottieCompositionAsState(composition)
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.align(Alignment.Center)) {
+            LottieAnimation(
+                modifier = Modifier.size(100.dp).align(Alignment.CenterHorizontally),
+                composition = composition,
+                progress = { progress },
+            )
+            Text(text = "식당으로 들어가고 있어요!", modifier = Modifier.padding(16.dp))
         }
     }
+}
+
+@Composable
+private fun ErrorSection(message: String) {
+    Text(
+        text = "오류: $message!\n 다시 시도해주세요!",
+        color = Color.Red,
+        modifier = Modifier.padding(16.dp),
+    )
+}
+
+@Composable
+private fun EmptySection() {
+    Text(
+        text = "선택한 날짜에 식단 정보가 없어요!",
+        modifier = Modifier.padding(16.dp),
+    )
 }
 
 @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
