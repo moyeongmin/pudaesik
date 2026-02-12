@@ -28,12 +28,13 @@ import com.mo.bbudaesik.presentation.ui.componenets.LargeChipGroup
 import com.mo.bbudaesik.presentation.ui.componenets.MediumChipGroup
 import com.mo.bbudaesik.presentation.ui.componenets.OptionDialog
 import com.mo.bbudaesik.presentation.ui.theme.BbudaesikTheme
+import com.mo.bbudaesik.presentation.viewmodel.MainContent
 import com.mo.bbudaesik.presentation.viewmodel.MainViewModel
 import com.mo.bbudaesik.utils.WeekInfo
 import com.mo.bbudaesik.utils.getDate
 
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
+fun mainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val weekInfo = getDate()
@@ -45,13 +46,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         )
     }
 
-    MainScreen(
+    mainScreen(
         selectedCafeteria = uiState.cafeteriaSelectedIndex,
         selectedDate = uiState.selectedDate,
         weekInfo = weekInfo,
-        sortedResMenuList = uiState.sortedResMenuList,
-        isLoading = uiState.isLoading,
-        error = uiState.error,
+        content = uiState.content,
         onCafeteriaClicked = viewModel::onCafeteriaClicked,
         onDateClicked = viewModel::onDateClicked,
         onFavoriteClicked = viewModel::onFavoriteClicked,
@@ -60,13 +59,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun MainScreen(
+fun mainScreen(
     selectedCafeteria: Int,
     selectedDate: Int,
+    content: MainContent,
     weekInfo: WeekInfo,
-    sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>>,
-    isLoading: Boolean,
-    error: String,
     onCafeteriaClicked: (Int) -> Unit,
     onDateClicked: (Int) -> Unit,
     onFavoriteClicked: (String) -> Unit,
@@ -97,37 +94,44 @@ fun MainScreen(
             thickness = 1.dp,
             color = Color(0xFFC2C2C4),
         )
-        if (isLoading) {
-            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
-            val progress by animateLottieCompositionAsState(composition)
-            Box(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
+        when (val content = content) {
+            MainContent.Loading -> {
+                val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+                val progress by animateLottieCompositionAsState(composition)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    LottieAnimation(
-                        modifier =
-                            Modifier
-                                .size(100.dp)
-                                .align(Alignment.CenterHorizontally),
-                        composition = composition,
-                        progress = { progress },
-                    )
-                    Text(text = "식당으로 들어가고 있어요!", modifier = Modifier.padding(16.dp))
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                    ) {
+                        LottieAnimation(
+                            modifier =
+                                Modifier
+                                    .size(100.dp)
+                                    .align(Alignment.CenterHorizontally),
+                            composition = composition,
+                            progress = { progress },
+                        )
+                        Text(text = "식당으로 들어가고 있어요!", modifier = Modifier.padding(16.dp))
+                    }
                 }
             }
-        } else if (error.isNotEmpty()) {
-            Text(
-                text = "오류: $error!\n 다시 시도해주세요!",
-                color = Color.Red,
-                modifier = Modifier.padding(16.dp),
-            )
-        } else {
-            CafeteriaMenu(
-                onFavoriteClicked = onFavoriteClicked,
-                fullMenuList = sortedResMenuList,
-            )
+            is MainContent.Error ->
+                Text(
+                    text = "오류: ${content.message}!\n 다시 시도해주세요!",
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp),
+                )
+            is MainContent.Menu ->
+                CafeteriaMenu(
+                    onFavoriteClicked = onFavoriteClicked,
+                    fullMenuList = content.sortedResMenuList,
+                )
+            MainContent.Empty ->
+                Text(
+                    text = "선택한 날짜에 식단 정보가 없어요!",
+                    modifier = Modifier.padding(16.dp),
+                )
         }
     }
 }
@@ -138,7 +142,7 @@ fun MainScreen(
 private fun MainScreenPreview() {
     BbudaesikTheme {
         Scaffold {
-            MainScreen(
+            mainScreen(
                 selectedCafeteria = 0,
                 selectedDate = 0,
                 weekInfo =
@@ -149,9 +153,7 @@ private fun MainScreenPreview() {
                 onCafeteriaClicked = {},
                 onDateClicked = {},
                 onFavoriteClicked = {},
-                sortedResMenuList = listOf(),
-                isLoading = false,
-                error = "",
+                content = MainContent.Loading,
                 showDialog = {},
             )
         }

@@ -21,8 +21,6 @@ import java.util.Locale
 import javax.inject.Inject
 
 data class MainUiState(
-    val isLoading: Boolean = false,
-    val error: String = "",
     val cafeteriaSelectedIndex: Int = 0,
     val selectedDate: Int = 0,
     val weekInfo: WeekInfo = getDate(),
@@ -31,8 +29,22 @@ data class MainUiState(
     val showDialog: Boolean = false,
     val dorMenuData: MutableMap<String, MutableMap<String, String>> = mutableMapOf(),
     val resMenuData: MutableMap<String, MutableMap<String, MutableList<Pair<String, String>>>> = mutableMapOf(),
-    val sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>> = emptyList(),
+    val content: MainContent = MainContent.Loading,
 )
+
+sealed interface MainContent {
+    data object Loading : MainContent
+
+    data class Error(
+        val message: String,
+    ) : MainContent
+
+    data object Empty : MainContent
+
+    data class Menu(
+        val sortedResMenuList: List<Triple<String, Boolean, Map<String, Map<String, String>>>>,
+    ) : MainContent
+}
 
 @HiltViewModel
 class MainViewModel
@@ -98,7 +110,7 @@ class MainViewModel
             val formattedDate = getFormattedDate()
 
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true, error = "") }
+                _uiState.update { it.copy(content = MainContent.Loading) }
 
                 try {
                     val resMenuDataMap = mutableMapOf<String, MutableMap<String, MutableList<Pair<String, String>>>>()
@@ -127,9 +139,8 @@ class MainViewModel
                     }
 
                     updateFullMenuList()
-                    _uiState.update { it.copy(isLoading = false) }
                 } catch (e: Exception) {
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "데이터를 불러오는 데 실패했습니다.") }
+                    _uiState.update { it.copy(content = MainContent.Error(e.message ?: "데이터를 불러오는 데 실패했습니다.")) }
                 }
             }
         }
@@ -163,7 +174,7 @@ class MainViewModel
                         .thenBy { it.first },
                 )
 
-            _uiState.update { it.copy(sortedResMenuList = combined) }
+            _uiState.update { it.copy(content = if (combined.isEmpty()) MainContent.Empty else MainContent.Menu(combined)) }
         }
 
         private fun isFavorite(name: String): Boolean = name in _uiState.value.favoriteNames
